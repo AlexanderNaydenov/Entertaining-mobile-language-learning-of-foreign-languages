@@ -1,0 +1,251 @@
+###Analysis of experimental data from the "Participant background survey" and the "Final Evaluation Survey"###
+
+#copy paste in notepad++ go to plugins npp html clipboard, paste in word
+rm(list=ls())
+
+test1<-read.csv("C:/Users/alex/Desktop/Master Thesis/Experiment data/test 1 - means.csv", sep=";",dec=",")
+names(test1)
+attach(test1)
+head(test1)
+
+###Descriptive Statistics----
+#means, medians, standard deviations
+length(Name) #total number of participants
+length(test1[treatmentGroup==1]) #number of treatment group participants
+length(test1[treatmentGroup==0]) #number of control group participants
+meanTreatment=round(sapply(test1[treatmentGroup==1,-1],mean),2)
+meanControl=round(sapply(test1[treatmentGroup==0,-1],mean),2)
+sdTreatment=round(sapply(test1[treatmentGroup==1,-1],sd),2)
+sdControl=round(sapply(test1[treatmentGroup==0,-1],sd),2)
+medianTreatment=round(sapply(test1[treatmentGroup==1,-1],median),2)
+medianControl=round(sapply(test1[treatmentGroup==0,-1],median),2)
+mydata<-cbind(meanTreatment,meanControl,sdTreatment,sdControl,medianTreatment,medianControl)
+
+install.packages("rJava")
+install.packages("xlsx")
+library(xlsx)
+write.xlsx(mydata,"C:/Users/alex/Desktop/Plots/mydata.xlsx")
+
+countVar<-vector()
+countVar1<-vector()
+for(i in 9:16)
+{
+  countVar[i-8]<-sum(test1[treatmentGroup==0,i])
+  countVar1[i-8]<-sum(test1[treatmentGroup==1,i])
+}
+names1<-names(test1[9:16])
+mydata1<-cbind(names1,countVar,countVar1)
+write.xlsx(mydata1,"C:/Users/alex/Desktop/Plots/mydata1.xlsx")
+
+#boxplots
+namesTest1<-names(test1)
+for (i in 2:8){
+mypath <- file.path("C:","Users","alex","Desktop","Plots",paste("boxplots_", namesTest1[i], ".jpg", sep = ""))
+jpeg(file=mypath)
+boxplot(test1[,i][treatmentGroup==1],test1[,i][treatmentGroup==0],names=c("Treatment Group","Control Group"),
+        col=c("yellow","blue"),main=names(test1[i]))
+dev.off()
+}
+
+{par(mfrow=c(2,2))
+boxplot(test1[,2][treatmentGroup==1],test1[,2][treatmentGroup==0],names=c("Treatment Group","Control Group"),
+        col=c("yellow","blue"),main=names(test1[2]))
+boxplot(test1[,3][treatmentGroup==1],test1[,3][treatmentGroup==0],names=c("Treatment Group","Control Group"),
+        col=c("yellow","blue"),main=names(test1[3]))
+boxplot(test1[,4][treatmentGroup==1],test1[,4][treatmentGroup==0],names=c("Treatment Group","Control Group"),
+        col=c("yellow","blue"),main=names(test1[4]))
+boxplot(test1[,5][treatmentGroup==1],test1[,5][treatmentGroup==0],names=c("Treatment Group","Control Group"),
+        col=c("yellow","blue"),main=names(test1[5]))
+boxplot(test1[,6][treatmentGroup==1],test1[,6][treatmentGroup==0],names=c("Treatment Group","Control Group"),
+        col=c("yellow","blue"),main=names(test1[6]))
+boxplot(test1[,7][treatmentGroup==1],test1[,7][treatmentGroup==0],names=c("Treatment Group","Control Group"),
+        col=c("yellow","blue"),main=names(test1[7]))
+boxplot(test1[,8][treatmentGroup==1],test1[,8][treatmentGroup==0],names=c("Treatment Group","Control Group"),
+        col=c("yellow","blue"),main=names(test1[8]))}
+
+#histograms
+install.packages("Hmisc")
+library(Hmisc)
+hist.data.frame(test1[,2:8],nclass=4)
+
+###Comparing the treatment and control groups via Kernel Density----
+#(superimpose the kernal density plots of two 
+#or more groups.The format is sm.density.compare(x, factor) where x is a numeric vector and factor is the 
+#grouping variable.)
+install.packages("sm")
+library(sm)
+par(mfrow=c(2,2)) 
+
+sm.density.compare(test1[,2],treatmentGroup,xlab="Control group (blue line) | Treatment group (dashed green line)",model="equal")
+title(main="Perceived improvement")
+sm.density.compare(test1[,3],treatmentGroup,xlab="Control group (blue line) | Treatment group (dashed green line)",model="equal")
+title(main="General acceptance")
+sm.density.compare(test1[,4],treatmentGroup,xlab="Control group (blue line) | Treatment group (dashed green line)",model="equal")
+title(main="Place and time flexibility")
+sm.density.compare(test1[,5],treatmentGroup,xlab="Control group (blue line) | Treatment group (dashed green line)",model="equal")
+title(main="Enjoyment and Motivation")
+sm.density.compare(test1[,6],treatmentGroup,xlab="Control group (blue line) | Treatment group (dashed green line)",model="equal")
+title(main="Positive effect of image on learning")
+sm.density.compare(test1[,7],treatmentGroup,xlab="Control group (blue line) | Treatment group (dashed green line)",model="equal")
+title(main="Importance of rudimentary gamification")
+sm.density.compare(test1[,8],treatmentGroup,xlab="Control group (blue line) | Treatment group (dashed green line)",model="equal")
+title(main="Difficulty of vocabulary")
+
+bootstrapPs<-vector()
+  for(i in 2:8){
+  bootstrapPs[i-1]<-sm.density.compare(test1[,i],treatmentGroup,model="equal",display="none")}
+
+###Inference Statistics----
+
+#Shapiro-Wilks Test for Normality----
+
+pValShapiro<-vector()
+for(i in 2:8){
+  pValShapiro[i-1]<-shapiro.test(test1[,i])$p.value
+}
+nullHHolds<-vector()
+for (i in 1:length(pValShapiro)){
+  if (pValShapiro[i]<0.05)
+    {nullHHolds[i]="Evidence against normality"}
+  else nullHHolds[i]="Normality holds"
+}
+isDataNormal<-cbind(names(test1[2:8]),pValShapiro,nullHHolds)
+#-->When having Evidence against normality, this is an indication that there might be a difference 
+#between the two groups
+#Decision against conducting a thorough analysis on the normalit of the subgroups, treatment and contorl, due to 
+#insufficient amount of data. 
+pValShapiroGroups<-vector()
+for(i in 2:8){pValShapiroGroups[i-1]<-shapiro.test(test1[,i][treatmentGroup==1])$p.value}
+pValShapiroTrGroup<-vector()
+for(i in 2:8){pValShapiroTrGroup[i-1]<-shapiro.test(test1[,i][treatmentGroup==1])$p.value}
+pValShapiroCoGroup<-vector()
+for(i in 2:8){pValShapiroCoGroup[i-1]<-shapiro.test(test1[,i][treatmentGroup==0])$p.value}
+shapiroT<-cbind(names(test1[2:8]),pValShapiroGroups,pValShapiroTrGroup,pValShapiroCoGroup)
+write.xlsx(shapiroT,"C:/Users/alex/Desktop/Plots/shapiroT.xlsx")
+
+#Using the Wilcoxon Signed-Rank Test, we can decide 
+#whether the corresponding data population distributions are identical without assuming them to follow the normal distribution.
+pValWilcox<-vector()
+for(i in 2:8){
+  pValWilcox[i-1]<-wilcox.test(test1[,i][treatmentGroup==1], test1[,i][treatmentGroup==0],paired=TRUE)$p.value
+}
+wilcoxS<-cbind(names(test1[2:8]),round(pValWilcox,2))
+
+write.xlsx(wilcoxS,"C:/Users/alex/Desktop/Plots/wilcoxS.xlsx")
+#Manual significance test----
+stdevimp=sqrt((8*var(improvement[1:9])+8*var(improvement[10:18]))/16)
+t=(mean(improvement[1:9])-mean(improvement[10:18]))/(stdevimp*sqrt(1/9+1/9))
+
+#Student t-tests for significant differences between groups----
+#Improvement: significantly diff
+#self-stated Liking_subj is not significantly different
+#Flexibility high variance in exp. sample, big difference between two variances, noisy; still, might be an indication that intrinsic motivation trumps extrinsic factors such as surrounding
+#Enjoyment variance is different, higher in experimental group (why? actually normal, humour is subjective..), p=6% and not significant; we could speculate that a higher sample will lead to significant results
+#Gamification - crowding out of gamification effects!!! intrinsic trumps gamification
+
+###Significant differences between the two samples - Experiment Group and Control Group; Assummed normality 
+#in the groups!
+
+meanTreatment=sapply(test1[treatmentGroup==1,-1],mean)
+meanControl=sapply(test1[treatmentGroup==0,-1],mean)
+sdTreatment=sapply(test1[treatmentGroup==1,-1],sd)
+sdControl=sapply(test1[treatmentGroup==0,-1],sd)
+
+ps<-vector()
+for (i in 2:15){
+  ps[i-1]<-t.test(test1[treatmentGroup==1,i],test1[treatmentGroup==0,i],var.equal=TRUE)$p.value
+}
+
+pVals<-cbind(meanTreatment[1:14],meanControl[1:14],sdTreatment[1:14],sdControl[1:14],ps)
+
+write.xlsx(pVals,"C:/Users/alex/Desktop/Plots/pVals.xlsx")
+
+###Correlations-----
+
+install.packages("Hmisc")
+library(Hmisc)
+
+#estimate corrs of treatment group
+corsTreatment=round(cor(as.matrix(test1[treatmentGroup==1,-c(1,16)],use="complete.obs", method="kendall")),2)
+#p-Values/significance of corrs
+resTreatment=rcorr(as.matrix(test1[treatmentGroup==1,-c(1,16)],type="pearson")) 
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+  )
+}
+corsTreatmentOrd=flattenCorrMatrix(resTreatment$r,resTreatment$P)[order(flattenCorrMatrix(resTreatment$r,
+                                                                                          resTreatment$P)[,3]),]
+write.xlsx(corsTreatmentOrd,"C:/Users/alex/Desktop/Plots/corsTreatmentOrd.xlsx")
+
+#estimate corrs of control group
+corsControl=round(cor(as.matrix(test1[treatmentGroup==0,-c(1,16)],use="complete.obs", method="kendall")),2)
+resControl=rcorr(as.matrix(test1[treatmentGroup==0,-c(1,16)],type="pearson"))
+corsControlOrd=flattenCorrMatrix(resControl$r,resControl$P)[order(flattenCorrMatrix(resControl$r,resControl$P)[,3]),]
+
+write.xlsx(corsTreatmentOrd,"C:/Users/alex/Desktop/Plots/corsControlOrd.xlsx")
+#corrs of total sample
+corsTotal=round(cor(as.matrix(test1[,-c(1,16)],use="complete.obs", method="kendall")),2)
+resTotal=rcorr(as.matrix(test1[,-c(1,16)],type="pearson"))
+corsTotalOrd=flattenCorrMatrix(resTotal$r,resTotal$P)[order(flattenCorrMatrix(resTotal$r,resTotal$P)[,3]),]
+write.xlsx(corsTotalOrd,"C:/Users/alex/Desktop/Plots/corsTotalOrd.xlsx")
+
+#plots for the corrs
+install.packages("corrplot")
+library(corrplot)
+par(mfrow=c(2,2)) 
+corrplot(corsTreatment, type="upper", order="hclust", tl.col="black", tl.srt=45) # looks cool
+corrplot(corsControl, type="upper", order="hclust", tl.col="black", tl.srt=45) # looks cool
+corrplot(corsTotal, type="upper", order="hclust", tl.col="black", tl.srt=45) # looks cool
+
+###Effects of external factors on evaluation answers----
+#If the participant has used language learning apps before (mlearner==1), are his answers different?
+
+mlearnP<-vector()
+for (i in 2:8){
+mlearnP[i-1]<-t.test(test1[,i][mlearner==0],test1[,i][mlearner==1],var.equal=TRUE)$p.value
+}
+
+#If the learners studies or intends to study Spanish, are his answers different?
+spanishP<-vector()
+for (i in 2:8){
+  spanishP[i-1]<-t.test(test1[,i][spanish==0],test1[,i][spanish==1],var.equal=TRUE)$p.value
+}
+
+#Does the satisfaction with the smartphone have an effect on the evaluation of the system?
+phoneP<-vector()
+for(i in 2:8){
+  phoneP[i-1]<-t.test(test1[,i][satisfiedPhone<=3],test1[,i][satisfiedPhone>3],var.equal=TRUE)$p.value
+}
+
+#Not all participants have gone through all the image-phrase units. Is there a difference between the evaluation 
+#of both types of participants?
+punctP<-vector()
+for(i in 2:8){
+  punctP[i-1]<-t.test(test1[,i][punctuality==0],test1[,i][punctuality==1],var.equal=TRUE)$p.value
+}
+#the ones who finished the test and filled in their names, have experienced the learning process 
+#as an easier one.
+  
+#Do the users who know the 9GAG platform have different answers than the ones who do not know it?
+user9gagP<-vector()
+for(i in 2:8){
+  user9gagP[i-1]<-t.test(test1[,i][user9gag==0],test1[,i][user9gag==1],var.equal=TRUE)$p.value
+}
+
+#Does the experienced difficulty level have an effect on participant's evaluation?
+difficultyP<-vector()
+for(i in 2:7){
+  difficultyP[i-1]<-t.test(test1[,i][difficulty<=4],test1[,i][difficulty>4],var.equal=TRUE)$p.value
+}
+mean(test1[,4][difficulty<=4])
+mean(test1[,4][difficulty>4])
+
+namesEv<-names(test1[2:8])
+mydata4<-cbind(namesEv,mlearnP,spanishP,phoneP,punctP,user9gagP,difficultyP)
+write.xlsx(mydata4,"C:/Users/alex/Desktop/Plots/mydata4.xlsx")
+
