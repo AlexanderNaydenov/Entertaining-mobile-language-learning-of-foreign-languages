@@ -8,6 +8,7 @@ This research paper presents and tests the hypothesis that entertaining visual c
 
 Moreover, the perceived improvement of language skills of these learners was higher. The author argues that mobile learning with entertaining image memes is authentic, personalized and contextualized. One major implication of this research paper is that methods for stimulating learners’ extrinsic motivation in popular language learning applications (gamification approach) can be complemented by introducing humorous content to engage users on a more intrinsic level.
 
-Author: Alex Naydenov
+*Author: Alex Naydenov
+Year of publication: 2015*
 
-Year of publication: 2015
+Full text: [pdf](http://vremigrant.com/wp-content/uploads/2018/04/Entertaining-mobile-learning-of-foreign-languages.pdf)
