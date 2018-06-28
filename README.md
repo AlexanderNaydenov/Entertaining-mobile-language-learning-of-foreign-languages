@@ -13,3 +13,7 @@ Moreover, the perceived improvement of language skills of these learners was hig
 **Key Words**: Mobile Language Learning, Motivation theory, Personalized Learning, 9GAG, Humour Studies
 
 **Full text:** [pdf](http://vremigrant.com/wp-content/uploads/2018/04/Entertaining-mobile-learning-of-foreign-languages.pdf)
+
+**Example screenshots**
+
+![Comparison between control and treatment](http://vremigrant.com/wp-content/uploads/2018/06/comparison.jpg)
