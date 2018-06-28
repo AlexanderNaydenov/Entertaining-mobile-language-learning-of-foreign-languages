@@ -16,4 +16,4 @@ Moreover, the perceived improvement of language skills of these learners was hig
 
 **Example screenshot of application**
 
-![Comparison between control and treatment](http://vremigrant.com/wp-content/uploads/2018/06/comparison.jpg =250x)
+![Comparison between control and treatment](http://vremigrant.com/wp-content/uploads/2018/06/comparison.jpg =400 × 352)
