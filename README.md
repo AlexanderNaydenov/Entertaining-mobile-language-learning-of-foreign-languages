@@ -14,6 +14,6 @@ Moreover, the perceived improvement of language skills of these learners was hig
 
 **Full text:** [pdf](http://vremigrant.com/wp-content/uploads/2018/04/Entertaining-mobile-learning-of-foreign-languages.pdf)
 
-**Example screenshots**
+**Example screenshot of application**
 
-![Comparison between control and treatment](http://vremigrant.com/wp-content/uploads/2018/06/comparison.jpg)
+![Comparison between control and treatment](http://vremigrant.com/wp-content/uploads/2018/06/comparison.jpg =250x)
