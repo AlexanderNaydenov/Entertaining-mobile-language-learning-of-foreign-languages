@@ -10,4 +10,4 @@ Moreover, the perceived improvement of language skills of these learners was hig
 
 **Year of publication:** 2015
 
-**Key Words**: Mobile Language Learning, Motivation theory, Personalized Learning, 9GAG, Humour Studies
+**Keywords**: Mobile Language Learning, Motivation theory, Personalized Learning, 9GAG, Humour Studies
